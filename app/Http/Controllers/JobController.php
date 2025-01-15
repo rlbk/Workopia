@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Job;
-use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Http\RedirectResponse;
 
 class JobController extends Controller
@@ -13,16 +12,16 @@ class JobController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index():View
+    public function index(): View
     {
         $jobs = Job::all();
-        return view('jobs.index')->with('jobs',$jobs);
+        return view('jobs.index')->with('jobs', $jobs);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create():View
+    public function create(): View
     {
         return view('jobs.create');
     }
@@ -30,24 +29,45 @@ class JobController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) :RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $validatedData =  $request->validate([
-            'title'=>'required|string|max:255',
-            'description'=>'required|string'
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'salary' => 'required|integer',
+            'tags' => 'nullable|string',
+            'job_type' => 'required|string',
+            'remote' => 'required|boolean',
+            'requirements' => 'nullable|string',
+            'benefits' => 'nullable|string',
+            'address' => 'nullable|string',
+            'city' => 'required|string',
+            'state' => 'required|string',
+            'zipcode' => 'nullable|string',
+            'contact_email' => 'required|string',
+            'contact_phone' => 'nullable|string',
+            'company_name' => 'required|string',
+            'company_description' => 'nullable|string',
+            'company_logo' => 'nullable|image|mines:jpeg,jpg,png,gif|max:2048',
+            'company_website' => 'nullable|url',
         ]);
 
-        Job::create(['title'=>$validatedData['title'],'description'=>$validatedData['description']]);
+        // hard coded user id
+        $validatedData['user_id'] = 1;
 
-        return redirect()->route('jobs.index');
+
+
+        Job::create($validatedData);
+
+        return redirect()->route('jobs.index')->with('success', 'Job listing created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Job $job):view
+    public function show(Job $job): view
     {
-        return view('jobs.show')->with('job',$job);
+        return view('jobs.show')->with('job', $job);
     }
 
     /**
